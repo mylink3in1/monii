@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dompet Mahasiswa Taiwan - Premium Login</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <!-- Firebase SDK & Koneksi Database -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase Baru (moni-7eec2)
+        const firebaseConfig = {
+            apiKey: "AIzaSyApizJrse4HFtgC0gDJm0qcBxx1dEiLrfw",
+            authDomain: "moni-7eec2.firebaseapp.com",
+            projectId: "moni-7eec2",
+            storageBucket: "moni-7eec2.firebasestorage.app",
+            messagingSenderId: "1058659267251",
+            appId: "1:1058659267251:web:9866428ec052cc790c36c6",
+            measurementId: "G-PXRE54GX6Y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.onSnapshot = onSnapshot;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.getDocs = getDocs;
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-800 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+    <!-- Efek Latar Belakang Premium (Glow Orbs yang Estetik) -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/30 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- KOTAK HALAMAN LOGIN PREMIUM -->
+    <div id="loginScreen" class="bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full max-w-md text-white transition-all duration-300 relative z-10">
+        <div class="text-center mb-8">
+            <!-- Ikon Celengan Babi / Piggy Bank Modern -->
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-pink-500/20 to-indigo-600/30 border border-pink-400/20 text-white mb-4 shadow-xl shadow-pink-500/5">
+                <svg class="w-10 h-10 text-pink-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 01-.586 1.414l-5 5A2 2 0 017 15.172V5L8 4z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11h.01M16 11h.01M10 15h4"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold tracking-tight">My Finances</h2>
+            <p class="text-xs text-indigo-300 mt-1">每次想家的时候，我都告诉自己：不混出个人样，绝不回头。</p>
+        </div>
+
+        <form onsubmit="prosesLogin(event)" class="space-y-5">
+            <div>
+                <label class="block text-xs font-medium text-indigo-200 mb-1.5">User ID</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-300 text-sm">👤</span>
+                    <input type="text" id="loginId" required placeholder="Masukkan User ID" class="w-full text-sm bg-slate-900/60 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-50ект focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-indigo-200 mb-1.5">Password</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-300 text-sm">🔑</span>
+                    <input type="password" id="loginPassword" required placeholder="Masukkan Password" class="w-full text-sm bg-slate-900/60 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition">
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-xl text-sm shadow-lg shadow-pink-500/20 transition-all duration-200 transform hover:-translate-y-0.5">
+                Masuk ke Dompet
+            </button>
+        </form>
+
+        <div class="mt-6 pt-6 border-t border-white/10 text-center">
+            <p class="text-[11px] text-indigo-300">MONII FINANCE &bull; <b class="text-white">Secure Cloud</b></p>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA APLIKASI KEUANGAN (TERSEMBUNYI SEBELUM LOGIN) -->
+    <div id="appScreen" class="hidden container mx-auto max-w-5xl p-4 md:p-6 w-full text-slate-800 relative z-10">
+        <!-- HEADER UTAMA -->
+        <header class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-6 rounded-3xl shadow-xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">MY FINANCES</h1>
+                <p class="text-indigo-100 text-xs mt-1">Sinkron Cloud Otomatis & Terenkripsi Aman</p>
+            </div>
+            <div class="flex flex-wrap gap-3 items-center">
+                <div class="bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl text-right border border-white/10">
+                    <span class="text-[10px] text-indigo-200 block uppercase tracking-wider">Sisa Saldo NTD</span>
+                    <span id="totalSaldo" class="text-lg font-bold">NT$ 0</span>
+                </div>
+                <div class="bg-emerald-900/40 backdrop-blur-md px-4 py-2.5 rounded-2xl text-right border border-emerald-500/30">
+                    <span class="text-[10px] text-emerald-200 block uppercase tracking-wider">Total Tabungan RUPIAH</span>
+                    <span id="totalBcaIdr" class="text-lg font-bold text-emerald-300">Rp 0</span>
+                </div>
+                <button onclick="logout()" class="bg-rose-500/80 hover:bg-rose-600 text-white text-xs px-3.5 py-3 rounded-2xl font-semibold transition shadow-md" title="Keluar Akun">
+                    🔒 Keluar
+                </button>
+            </div>
+        </header>
+
+        <!-- KARTU RINGKASAN STATISTIK -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                <span class="text-slate-400 text-xs font-medium">Total Pemasukan (Gaji) DI TAIWAN</span>
+                <h2 id="totalPemasukan" class="text-xl font-bold text-emerald-600 mt-1">NT$ 0</h2>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+                <span class="text-slate-400 text-xs font-medium">Total Pengeluaran DI TAIWAN</span>
+                <h2 id="totalPengeluaran" class="text-xl font-bold text-rose-600 mt-1">NT$ 0</h2>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                <span class="text-slate-400 text-xs font-medium">Kirim ke MAMA </span>
+                <h2 id="totalKirim" class="text-xl font-bold text-amber-600 mt-1">NT$ 0</h2>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                <span class="text-slate-400 text-xs font-medium">Tabungan ke BCA NTD TO RUPIAH (NTD)</span>
+                <h2 id="totalTabunganNtd" class="text-xl font-bold text-blue-600 mt-1">NT$ 0</h2>
+            </div>
+        </div>
+
+        <!-- KONTEN UTAMA: FORM & TABEL -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Form Input Transaksi & Pengaturan -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 md:col-span-1 h-fit space-y-4">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm mb-4 pb-2 border-b flex items-center justify-between">
+                        <span>Tambah Transaksi Baru</span>
+                        <span class="text-indigo-600 text-xs font-normal">+ Catat</span>
+                    </h3>
+                    <form id="formTransaksi" onsubmit="tambahTransaksiOnline(event)" class="space-y-3.5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan / Sumber</label>
+                            <input type="text" id="keterangan" required placeholder="Contoh: Gaji Part-time" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
+                            <select id="kategori" onchange="cekKategori()" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                <option value="Pemasukan">Pemasukan (Gaji/Lainnya)</option>
+                                <option value="Pengeluaran">Pengeluaran (Makan/Transport/uang sekolah)</option>
+                                <option value="Kirim Kampung">Kirim ke MAMA</option>
+                                <option value="Tabungan BCA">Tabungan / Kirim ke BCA</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah (NT$)</label>
+                            <input type="number" id="jumlah" step="any" required placeholder="Contoh: 5000" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+
+                        <div id="divKurs" class="hidden bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100 space-y-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-indigo-900 mb-1">Kurs NTD ke IDR (Hari Ini)</label>
+                                <input type="number" id="kurs" step="any" placeholder="Contoh: 510" class="w-full text-sm bg-white border border-indigo-200 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                            </div>
+                            <p class="text-[10px] text-indigo-600">*Otomatis mengonversi total ke Rupiah BCA.</p>
+                        </div>
+
+                        <button type="submit" id="btnSimpan" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-sm shadow-md shadow-indigo-500/20 transition">
+                            Simpan ke Cloud
+                        </button>
+                    </form>
+                </div>
+
+                <div class="pt-4 border-t space-y-2">
+                    <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Keamanan & Akun</h4>
+                    <button onclick="bukaModalGantiPassword()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+                        🔑 Ganti ID & Password
+                    </button>
+                    <button onclick="bukaModalReset()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+                        ⚠️ Reset Semua Data (Database)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabel Riwayat Transaksi -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 md:col-span-2">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                    <h3 class="font-bold text-slate-800 text-sm">Riwayat Aliran Uang</h3>
+                    <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">● Live Sync Cloud</span>
+                </div>
+                <div class="overflow-x-auto max-h-[480px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold">
+                                <th class="p-3 rounded-l-xl">Keterangan</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Jumlah (NT$)</th>
+                                <th class="p-3">Detail BCA (IDR)</th>
+                                <th class="p-3 text-center rounded-r-xl">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelTransaksi" class="divide-y divide-slate-50">
+                            <tr><td colspan="5" class="text-center p-6 text-slate-400 text-xs">Memuat data dari server...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT APLIKASI -->
+    <script>
+        // Mengatur Default User & Password baru ke "monii" dan "12345" jika belum ada
+        if (!localStorage.getItem('appUser')) {
+            localStorage.setItem('appUser', 'monii');
+        }
+        if (!localStorage.getItem('appPassword')) {
+            localStorage.setItem('appPassword', '12345');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                tampilkanAplikasi();
+            }
+        };
+
+        function prosesLogin(e) {
+            e.preventDefault();
+            const inputId = document.getElementById('loginId').value.trim();
+            const inputPass = document.getElementById('loginPassword').value.trim();
+
+            const savedUser = localStorage.getItem('appUser');
+            const savedPass = localStorage.getItem('appPassword');
+
+            if (inputId === savedUser && inputPass === savedPass) {
+                localStorage.setItem('isLoggedIn', 'true');
+                tampilkanAplikasi();
+            } else {
+                alert("User ID atau Password salah!");
+            }
+        }
+
+        function tampilkanAplikasi() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            document.body.classList.remove('bg-slate-950', 'flex', 'items-center', 'justify-center', 'overflow-hidden');
+            document.body.classList.add('bg-slate-50');
+            inisialisasiAppFirebase();
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            location.reload();
+        }
+
+        function formatAngka(angka) {
+            return new Intl.NumberFormat('id-ID').format(Math.round(angka));
+        }
+
+        function cekKategori() {
+            const kategori = document.getElementById('kategori').value;
+            const divKurs = document.getElementById('divKurs');
+            const inputKurs = document.getElementById('kurs');
+
+            if (kategori === 'Tabungan BCA') {
+                divKurs.classList.remove('hidden');
+                inputKurs.required = true;
+            } else {
+                divKurs.classList.add('hidden');
+                inputKurs.required = false;
+                inputKurs.value = '';
+            }
+        }
+
+        function bukaModalGantiPassword() {
+            const passLama = prompt("Masukkan Password Saat Ini:");
+            if (passLama === null) return;
+
+            if (passLama !== localStorage.getItem('appPassword')) {
+                alert("Password salah!");
+                return;
+            }
+
+            const idBaru = prompt("Masukkan User ID Baru:", localStorage.getItem('appUser'));
+            const passBaru = prompt("Masukkan Password Baru:");
+
+            if (idBaru && passBaru && idBaru.trim() !== "" && passBaru.trim() !== "") {
+                localStorage.setItem('appUser', idBaru.trim());
+                localStorage.setItem('appPassword', passBaru.trim());
+                alert("User ID & Password berhasil diubah! Silakan login kembali.");
+                logout();
+            } else {
+                alert("ID atau Password baru tidak boleh kosong.");
+            }
+        }
+
+        async function bukaModalReset() {
+            const passwordInput = prompt("PERINGATAN: Semua data di Cloud akan dihapus!\nMasukkan Password untuk konfirmasi:");
+            if (passwordInput === null) return;
+
+            if (passwordInput !== localStorage.getItem('appPassword')) {
+                alert("Password salah! Reset dibatalkan.");
+                return;
+            }
+
+            if (confirm("Anda yakin 100% ingin menghapus seluruh data keuangan di server?")) {
+                try {
+                    const qSnapshot = await window.getDocs(window.collection(window.db, "transaksi"));
+                    let hapusPromises = [];
+                    qSnapshot.forEach((docSnap) => {
+                        hapusPromises.push(window.deleteDoc(window.doc(window.db, "transaksi", docSnap.id)));
+                    });
+                    await Promise.all(hapusPromises);
+                    alert("Semua data berhasil direset bersih!");
+                } catch (error) {
+                    alert("Gagal mereset data: " + error.message);
+                }
+            }
+        }
+
+        function inisialisasiAppFirebase() {
+            const q = window.query(window.collection(window.db, "transaksi"), window.orderBy("waktu", "desc"));
+            
+            window.onSnapshot(q, (snapshot) => {
+                const tabel = document.getElementById('tabelTransaksi');
+                tabel.innerHTML = '';
+
+                let totalPemasukan = 0;
+                let totalPengeluaran = 0;
+                let totalKirim = 0;
+                let totalTabunganNtd = 0;
+                let totalBcaIdr = 0;
+
+                if (snapshot.empty) {
+                    tabel.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400 text-xs">Belum ada catatan keuangan.</td></tr>`;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    let data = docSnap.data();
+                    data.idDb = docSnap.id;
+
+                    let badgeColor = '';
+                    let infoDetail = '-';
+
+                    if(data.kategori === 'Pemasukan') {
+                        badgeColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+                        totalPemasukan += data.jumlah;
+                    } else if(data.kategori === 'Pengeluaran') {
+                        badgeColor = 'bg-rose-50 text-rose-700 border border-rose-200';
+                        totalPengeluaran += data.jumlah;
+                    } else if(data.kategori === 'Kirim Kampung') {
+                        badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
+                        totalKirim += data.jumlah;
+                    } else if(data.kategori === 'Tabungan BCA') {
+                        badgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
+                        totalTabunganNtd += data.jumlah;
+                        totalBcaIdr += data.totalIdr;
+                        infoDetail = `Kurs: ${data.kurs} | <strong class="text-emerald-600">Rp ${formatAngka(data.totalIdr)}</strong>`;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50/80 transition";
+                    row.innerHTML = `
+                        <td class="p-3 font-medium text-slate-700">${data.keterangan}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}">${data.kategori}</span></td>
+                        <td class="p-3 font-semibold text-slate-700">NT$ ${formatAngka(data.jumlah)}</td>
+                        <td class="p-3 text-xs text-slate-600">${infoDetail}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="hapusTransaksiOnline('${data.idDb}')" class="text-rose-400 hover:text-rose-600 text-xs font-semibold transition px-2 py-1 rounded-lg hover:bg-rose-50">Hapus</button>
+                        </td>
+                    `;
+                    tabel.appendChild(row);
+                });
+
+                let totalSaldoNtd = totalPemasukan - (totalPengeluaran + totalKirim + totalTabunganNtd);
+
+                document.getElementById('totalPemasukan').innerText = `NT$ ${formatAngka(totalPemasukan)}`;
+                document.getElementById('totalPengeluaran').innerText = `NT$ ${formatAngka(totalPengeluaran)}`;
+                document.getElementById('totalKirim').innerText = `NT$ ${formatAngka(totalKirim)}`;
+                document.getElementById('totalTabunganNtd').innerText = `NT$ ${formatAngka(totalTabunganNtd)}`;
+                document.getElementById('totalBcaIdr').innerText = `Rp ${formatAngka(totalBcaIdr)}`;
+                
+                const elemenSaldo = document.getElementById('totalSaldo');
+                elemenSaldo.innerText = `NT$ ${formatAngka(totalSaldoNtd)}`;
+            });
+        }
+
+        window.tambahTransaksiOnline = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            btn.innerText = "Menyimpan...";
+            btn.disabled = true;
+
+            const keterangan = document.getElementById('keterangan').value;
+            const kategori = document.getElementById('kategori').value;
+            const jumlah = parseFloat(document.getElementById('jumlah').value);
+            
+            let kurs = 0;
+            let totalIdr = 0;
+
+            if (kategori === 'Tabungan BCA') {
+                kurs = parseFloat(document.getElementById('kurs').value) || 0;
+                totalIdr = jumlah * kurs;
+            }
+
+            try {
+                await window.addDoc(window.collection(window.db, "transaksi"), {
+                    keterangan,
+                    kategori,
+                    jumlah,
+                    kurs,
+                    totalIdr,
+                    waktu: Date.now()
+                });
+
+                document.getElementById('formTransaksi').reset();
+                cekKategori();
+            } catch (error) {
+                alert("Gagal menyimpan: " + error.message);
+            } finally {
+                btn.innerText = "Simpan ke Cloud";
+                btn.disabled = false;
+            }
+        };
+
+        window.hapusTransaksiOnline = async function(idDb) {
+            if(confirm("Yakin ingin menghapus catatan ini?")) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "transaksi", idDb));
+                } catch (error) {
+                    alert("Gagal menghapus: " + error.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
