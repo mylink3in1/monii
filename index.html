@@ -11,35 +11,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
-    <!-- Firebase SDK & Koneksi Database -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // Konfigurasi Firebase Baru (moni-7eec2)
-        const firebaseConfig = {
-            apiKey: "AIzaSyApizJrse4HFtgC0gDJm0qcBxx1dEiLrfw",
-            authDomain: "moni-7eec2.firebaseapp.com",
-            projectId: "moni-7eec2",
-            storageBucket: "moni-7eec2.firebasestorage.app",
-            messagingSenderId: "1058659267251",
-            appId: "1:1058659267251:web:9866428ec052cc790c36c6",
-            measurementId: "G-PXRE54GX6Y"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-        window.onSnapshot = onSnapshot;
-        window.query = query;
-        window.orderBy = orderBy;
-        window.getDocs = getDocs;
-    </script>
 </head>
 <body class="bg-slate-950 text-slate-800 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
@@ -83,7 +54,7 @@
         </form>
 
         <div class="mt-6 pt-6 border-t border-white/10 text-center">
-            <p class="text-[11px] text-indigo-300">MONII FINANCE &bull; <b class="text-white">Secure Cloud</b></p>
+            <p class="text-[11px] text-indigo-300">MONII FINANCE &bull; <b class="text-white">Local Storage</b></p>
         </div>
     </div>
 
@@ -93,7 +64,7 @@
         <header class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-6 rounded-3xl shadow-xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">MY FINANCES</h1>
-                <p class="text-indigo-100 text-xs mt-1">Sinkron Cloud Otomatis & Terenkripsi Aman</p>
+                <p class="text-indigo-100 text-xs mt-1">Data tersimpan otomatis di perangkat ini</p>
             </div>
             <div class="flex flex-wrap gap-3 items-center">
                 <div class="bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl text-right border border-white/10">
@@ -171,7 +142,7 @@
                         </div>
 
                         <button type="submit" id="btnSimpan" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-sm shadow-md shadow-indigo-500/20 transition">
-                            Simpan ke Cloud
+                            Simpan Transaksi
                         </button>
                     </form>
                 </div>
@@ -182,7 +153,7 @@
                         🔑 Ganti ID & Password
                     </button>
                     <button onclick="bukaModalReset()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
-                        ⚠️ Reset Semua Data (Database)
+                        ⚠️ Reset Semua Data
                     </button>
                 </div>
             </div>
@@ -191,7 +162,7 @@
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 md:col-span-2">
                 <div class="flex justify-between items-center mb-4 pb-2 border-b">
                     <h3 class="font-bold text-slate-800 text-sm">Riwayat Aliran Uang</h3>
-                    <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">● Live Sync Cloud</span>
+                    <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">● Tersimpan di Perangkat</span>
                 </div>
                 <div class="overflow-x-auto max-h-[480px] overflow-y-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -205,7 +176,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabelTransaksi" class="divide-y divide-slate-50">
-                            <tr><td colspan="5" class="text-center p-6 text-slate-400 text-xs">Memuat data dari server...</td></tr>
+                            <tr><td colspan="5" class="text-center p-6 text-slate-400 text-xs">Memuat data tersimpan...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -250,7 +221,7 @@
             document.getElementById('appScreen').classList.remove('hidden');
             document.body.classList.remove('bg-slate-950', 'flex', 'items-center', 'justify-center', 'overflow-hidden');
             document.body.classList.add('bg-slate-50');
-            inisialisasiAppFirebase();
+            inisialisasiAppLocalStorage();
         }
 
         function logout() {
@@ -299,8 +270,8 @@
             }
         }
 
-        async function bukaModalReset() {
-            const passwordInput = prompt("PERINGATAN: Semua data di Cloud akan dihapus!\nMasukkan Password untuk konfirmasi:");
+        function bukaModalReset() {
+            const passwordInput = prompt("PERINGATAN: Semua data transaksi yang tersimpan di perangkat ini akan dihapus!\\nMasukkan Password untuk konfirmasi:");
             if (passwordInput === null) return;
 
             if (passwordInput !== localStorage.getItem('appPassword')) {
@@ -308,108 +279,105 @@
                 return;
             }
 
-            if (confirm("Anda yakin 100% ingin menghapus seluruh data keuangan di server?")) {
-                try {
-                    const qSnapshot = await window.getDocs(window.collection(window.db, "transaksi"));
-                    let hapusPromises = [];
-                    qSnapshot.forEach((docSnap) => {
-                        hapusPromises.push(window.deleteDoc(window.doc(window.db, "transaksi", docSnap.id)));
-                    });
-                    await Promise.all(hapusPromises);
-                    alert("Semua data berhasil direset bersih!");
-                } catch (error) {
-                    alert("Gagal mereset data: " + error.message);
-                }
+            if (confirm("Anda yakin ingin menghapus seluruh data keuangan di perangkat ini?")) {
+                localStorage.removeItem('transaksi');
+                inisialisasiAppLocalStorage();
+                alert("Semua data transaksi berhasil direset!");
             }
         }
 
-        function inisialisasiAppFirebase() {
-            const q = window.query(window.collection(window.db, "transaksi"), window.orderBy("waktu", "desc"));
-            
-            window.onSnapshot(q, (snapshot) => {
-                const tabel = document.getElementById('tabelTransaksi');
-                tabel.innerHTML = '';
-
-                let totalPemasukan = 0;
-                let totalPengeluaran = 0;
-                let totalKirim = 0;
-                let totalTabunganNtd = 0;
-                let totalBcaIdr = 0;
-
-                if (snapshot.empty) {
-                    tabel.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400 text-xs">Belum ada catatan keuangan.</td></tr>`;
-                }
-
-                snapshot.forEach((docSnap) => {
-                    let data = docSnap.data();
-                    data.idDb = docSnap.id;
-
-                    let badgeColor = '';
-                    let infoDetail = '-';
-
-                    if(data.kategori === 'Pemasukan') {
-                        badgeColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-                        totalPemasukan += data.jumlah;
-                    } else if(data.kategori === 'Pengeluaran') {
-                        badgeColor = 'bg-rose-50 text-rose-700 border border-rose-200';
-                        totalPengeluaran += data.jumlah;
-                    } else if(data.kategori === 'Kirim Kampung') {
-                        badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
-                        totalKirim += data.jumlah;
-                    } else if(data.kategori === 'Tabungan BCA') {
-                        badgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
-                        totalTabunganNtd += data.jumlah;
-                        totalBcaIdr += data.totalIdr;
-                        infoDetail = `Kurs: ${data.kurs} | <strong class="text-emerald-600">Rp ${formatAngka(data.totalIdr)}</strong>`;
-                    }
-
-                    const row = document.createElement('tr');
-                    row.className = "hover:bg-slate-50/80 transition";
-                    row.innerHTML = `
-                        <td class="p-3 font-medium text-slate-700">${data.keterangan}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}">${data.kategori}</span></td>
-                        <td class="p-3 font-semibold text-slate-700">NT$ ${formatAngka(data.jumlah)}</td>
-                        <td class="p-3 text-xs text-slate-600">${infoDetail}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="hapusTransaksiOnline('${data.idDb}')" class="text-rose-400 hover:text-rose-600 text-xs font-semibold transition px-2 py-1 rounded-lg hover:bg-rose-50">Hapus</button>
-                        </td>
-                    `;
-                    tabel.appendChild(row);
-                });
-
-                let totalSaldoNtd = totalPemasukan - (totalPengeluaran + totalKirim + totalTabunganNtd);
-
-                document.getElementById('totalPemasukan').innerText = `NT$ ${formatAngka(totalPemasukan)}`;
-                document.getElementById('totalPengeluaran').innerText = `NT$ ${formatAngka(totalPengeluaran)}`;
-                document.getElementById('totalKirim').innerText = `NT$ ${formatAngka(totalKirim)}`;
-                document.getElementById('totalTabunganNtd').innerText = `NT$ ${formatAngka(totalTabunganNtd)}`;
-                document.getElementById('totalBcaIdr').innerText = `Rp ${formatAngka(totalBcaIdr)}`;
-                
-                const elemenSaldo = document.getElementById('totalSaldo');
-                elemenSaldo.innerText = `NT$ ${formatAngka(totalSaldoNtd)}`;
-            });
+        function ambilTransaksi() {
+            return JSON.parse(localStorage.getItem('transaksi') || '[]');
         }
 
-        window.tambahTransaksiOnline = async function(e) {
+        function simpanTransaksi(data) {
+            localStorage.setItem('transaksi', JSON.stringify(data));
+        }
+
+        function inisialisasiAppLocalStorage() {
+            const tabel = document.getElementById('tabelTransaksi');
+            tabel.innerHTML = '';
+
+            let totalPemasukan = 0;
+            let totalPengeluaran = 0;
+            let totalKirim = 0;
+            let totalTabunganNtd = 0;
+            let totalBcaIdr = 0;
+
+            const transaksi = ambilTransaksi().sort((a, b) => b.waktu - a.waktu);
+
+            if (transaksi.length === 0) {
+                tabel.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400 text-xs">Belum ada catatan keuangan.</td></tr>`;
+            }
+
+            transaksi.forEach((data) => {
+                let badgeColor = '';
+                let infoDetail = '-';
+
+                if (data.kategori === 'Pemasukan') {
+                    badgeColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+                    totalPemasukan += Number(data.jumlah) || 0;
+                } else if (data.kategori === 'Pengeluaran') {
+                    badgeColor = 'bg-rose-50 text-rose-700 border border-rose-200';
+                    totalPengeluaran += Number(data.jumlah) || 0;
+                } else if (data.kategori === 'Kirim Kampung') {
+                    badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
+                    totalKirim += Number(data.jumlah) || 0;
+                } else if (data.kategori === 'Tabungan BCA') {
+                    badgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
+                    totalTabunganNtd += Number(data.jumlah) || 0;
+                    totalBcaIdr += Number(data.totalIdr) || 0;
+                    infoDetail = `Kurs: ${data.kurs} | <strong class="text-emerald-600">Rp ${formatAngka(data.totalIdr)}</strong>`;
+                }
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/80 transition";
+                row.innerHTML = `
+                    <td class="p-3 font-medium text-slate-700"></td>
+                    <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeColor}">${data.kategori}</span></td>
+                    <td class="p-3 font-semibold text-slate-700">NT$ ${formatAngka(data.jumlah)}</td>
+                    <td class="p-3 text-xs text-slate-600">${infoDetail}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="hapusTransaksiOnline('${data.idDb}')" class="text-rose-400 hover:text-rose-600 text-xs font-semibold transition px-2 py-1 rounded-lg hover:bg-rose-50">Hapus</button>
+                    </td>
+                `;
+                // Assign as text, not HTML, to safely display the transaction description.
+                row.children[0].textContent = data.keterangan || '';
+                tabel.appendChild(row);
+            });
+
+            const totalSaldoNtd = totalPemasukan - (totalPengeluaran + totalKirim + totalTabunganNtd);
+
+            document.getElementById('totalPemasukan').innerText = `NT$ ${formatAngka(totalPemasukan)}`;
+            document.getElementById('totalPengeluaran').innerText = `NT$ ${formatAngka(totalPengeluaran)}`;
+            document.getElementById('totalKirim').innerText = `NT$ ${formatAngka(totalKirim)}`;
+            document.getElementById('totalTabunganNtd').innerText = `NT$ ${formatAngka(totalTabunganNtd)}`;
+            document.getElementById('totalBcaIdr').innerText = `Rp ${formatAngka(totalBcaIdr)}`;
+            document.getElementById('totalSaldo').innerText = `NT$ ${formatAngka(totalSaldoNtd)}`;
+        }
+
+        window.tambahTransaksiOnline = function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSimpan');
             btn.innerText = "Menyimpan...";
             btn.disabled = true;
 
-            const keterangan = document.getElementById('keterangan').value;
-            const kategori = document.getElementById('kategori').value;
-            const jumlah = parseFloat(document.getElementById('jumlah').value);
-            
-            let kurs = 0;
-            let totalIdr = 0;
-
-            if (kategori === 'Tabungan BCA') {
-                kurs = parseFloat(document.getElementById('kurs').value) || 0;
-                totalIdr = jumlah * kurs;
-            }
-
             try {
-                await window.addDoc(window.collection(window.db, "transaksi"), {
+                const keterangan = document.getElementById('keterangan').value.trim();
+                const kategori = document.getElementById('kategori').value;
+                const jumlah = parseFloat(document.getElementById('jumlah').value);
+
+                let kurs = 0;
+                let totalIdr = 0;
+
+                if (kategori === 'Tabungan BCA') {
+                    kurs = parseFloat(document.getElementById('kurs').value) || 0;
+                    totalIdr = jumlah * kurs;
+                }
+
+                const transaksi = ambilTransaksi();
+                transaksi.push({
+                    idDb: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2),
                     keterangan,
                     kategori,
                     jumlah,
@@ -418,25 +386,26 @@
                     waktu: Date.now()
                 });
 
+                simpanTransaksi(transaksi);
                 document.getElementById('formTransaksi').reset();
                 cekKategori();
+                inisialisasiAppLocalStorage();
             } catch (error) {
                 alert("Gagal menyimpan: " + error.message);
             } finally {
-                btn.innerText = "Simpan ke Cloud";
+                btn.innerText = "Simpan Transaksi";
                 btn.disabled = false;
             }
         };
 
-        window.hapusTransaksiOnline = async function(idDb) {
-            if(confirm("Yakin ingin menghapus catatan ini?")) {
-                try {
-                    await window.deleteDoc(window.doc(window.db, "transaksi", idDb));
-                } catch (error) {
-                    alert("Gagal menghapus: " + error.message);
-                }
+        window.hapusTransaksiOnline = function(idDb) {
+            if (confirm("Yakin ingin menghapus catatan ini?")) {
+                const transaksi = ambilTransaksi().filter(item => item.idDb !== idDb);
+                simpanTransaksi(transaksi);
+                inisialisasiAppLocalStorage();
             }
         };
+
     </script>
 </body>
 </html>
